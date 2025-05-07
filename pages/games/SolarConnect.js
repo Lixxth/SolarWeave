@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import Link from 'next/link';
-import { HomeIcon } from 'lucide-react';
+import { HomeIcon, SunIcon, ZapIcon } from 'lucide-react';
 
 const SolarConnect = () => {
   const [level, setLevel] = useState(1);
@@ -13,39 +13,60 @@ const SolarConnect = () => {
   const [selectedMesh, setSelectedMesh] = useState(null);
   const [connections, setConnections] = useState([]);
   const [timeLeft, setTimeLeft] = useState(60);
+  const [energyLevel, setEnergyLevel] = useState(0);
   const router = useRouter();
 
   // Configuración de niveles
   const levelConfig = {
     1: {
-      meshes: 3,
+      sources: 2,
+      receivers: 2,
       time: 60,
-      points: 100
+      points: 100,
+      energyNeeded: 50
     },
     2: {
-      meshes: 4,
+      sources: 4,
+      receivers: 3,
       time: 90,
-      points: 200
+      points: 200,
+      energyNeeded: 50
     },
     3: {
-      meshes: 5,
+      sources: 4,
+      receivers: 4,
       time: 120,
-      points: 300
+      points: 300,
+      energyNeeded: 50
     }
   };
 
   // Generar mallas para el nivel actual
   const generateMeshes = () => {
     const meshes = [];
-    const numMeshes = levelConfig[level].meshes;
+    const config = levelConfig[level];
     
-    for (let i = 0; i < numMeshes; i++) {
+    // Generar fuentes solares
+    for (let i = 0; i < config.sources; i++) {
       meshes.push({
-        id: i,
+        id: `source-${i}`,
         x: Math.random() * (window.innerWidth - 200) + 100,
         y: Math.random() * (window.innerHeight - 300) + 100,
         connected: false,
-        type: Math.random() > 0.5 ? 'source' : 'receiver'
+        type: 'source',
+        energy: 30
+      });
+    }
+
+    // Generar receptores
+    for (let i = 0; i < config.receivers; i++) {
+      meshes.push({
+        id: `receiver-${i}`,
+        x: Math.random() * (window.innerWidth - 200) + 100,
+        y: Math.random() * (window.innerHeight - 300) + 100,
+        connected: false,
+        type: 'receiver',
+        energy: 0
       });
     }
     return meshes;
@@ -61,6 +82,7 @@ const SolarConnect = () => {
     setTimeLeft(levelConfig[1].time);
     setMeshes(generateMeshes());
     setConnections([]);
+    setEnergyLevel(0);
   };
 
   // Manejar clic en malla
@@ -68,36 +90,44 @@ const SolarConnect = () => {
     if (!gameActive) return;
 
     if (!selectedMesh) {
-      if (mesh.type === 'source') {
+      if (mesh.type === 'source' && !mesh.connected) {
         setSelectedMesh(mesh);
       }
     } else {
-      if (mesh.type === 'receiver' && mesh.id !== selectedMesh.id) {
+      if (mesh.type === 'receiver' && !mesh.connected) {
         // Crear conexión
         const newConnection = {
           from: selectedMesh.id,
-          to: mesh.id
+          to: mesh.id,
+          energy: selectedMesh.energy
         };
         setConnections([...connections, newConnection]);
         
         // Actualizar estado de las mallas
         setMeshes(prevMeshes => 
-          prevMeshes.map(m => 
-            m.id === mesh.id ? { ...m, connected: true } : m
-          )
+          prevMeshes.map(m => {
+            if (m.id === mesh.id) {
+              return { ...m, connected: true, energy: selectedMesh.energy };
+            }
+            if (m.id === selectedMesh.id) {
+              return { ...m, connected: true };
+            }
+            return m;
+          })
         );
+
+        // Actualizar nivel de energía
+        setEnergyLevel(prev => prev + selectedMesh.energy);
 
         // Verificar si se completó el nivel
-        const allConnected = meshes.every(m => 
-          m.type === 'source' || m.connected
-        );
-
-        if (allConnected) {
-          setScore(prev => prev + levelConfig[level].points);
+        const config = levelConfig[level];
+        if (energyLevel + selectedMesh.energy >= config.energyNeeded) {
+          setScore(prev => prev + config.points);
           if (level < 3) {
             setLevel(prev => prev + 1);
             setMeshes(generateMeshes());
             setTimeLeft(levelConfig[level + 1].time);
+            setEnergyLevel(0);
           } else {
             setGameActive(false);
           }
@@ -151,6 +181,10 @@ const SolarConnect = () => {
           <p className="text-sm text-gray-600">Tiempo</p>
           <p className="text-2xl font-bold text-red-600">{timeLeft}s</p>
         </div>
+        <div className="text-center">
+          <p className="text-sm text-gray-600">Energía</p>
+          <p className="text-2xl font-bold text-yellow-600">{energyLevel}/{levelConfig[level].energyNeeded}</p>
+        </div>
       </div>
 
       {/* Game Area */}
@@ -163,7 +197,7 @@ const SolarConnect = () => {
             <p className="text-gray-600 mb-8">
               {timeLeft === 0 
                 ? `Tu puntuación final: ${score}`
-                : 'Conecta las mallas solares para crear energía'}
+                : 'Conecta las fuentes solares con los receptores para generar energía'}
             </p>
             <button
               onClick={startGame}
@@ -207,13 +241,25 @@ const SolarConnect = () => {
                   top: `${mesh.y}px`,
                 }}
               >
-                <Image
-                  src={mesh.type === 'source' ? '/Juegos/sol.png' : '/Juegos/solar-receiver.png'}
-                  alt={mesh.type === 'source' ? 'Fuente solar' : 'Receptor solar'}
-                  width={100}
-                  height={100}
-                  className={mesh.connected ? 'animate-pulse' : ''}
-                />
+                <div className="relative">
+                  <Image
+                    src={mesh.type === 'source' ? '/Juegos/sol.png' : '/Juegos/solar-receiver.png'}
+                    alt={mesh.type === 'source' ? 'Fuente solar' : 'Receptor solar'}
+                    width={100}
+                    height={100}
+                    className={mesh.connected ? 'animate-pulse' : ''}
+                  />
+                  {mesh.type === 'source' && (
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm">
+                      {mesh.energy} kW
+                    </div>
+                  )}
+                  {mesh.type === 'receiver' && mesh.connected && (
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm">
+                      {mesh.energy} kW
+                    </div>
+                  )}
+                </div>
               </button>
             ))}
           </div>
@@ -225,7 +271,8 @@ const SolarConnect = () => {
         <div className="fixed bottom-0 left-0 right-0 bg-white/90 p-4 text-center">
           <h3 className="text-lg font-semibold text-red-700 mb-2">¿Cómo jugar?</h3>
           <p className="text-gray-600">
-            Conecta las fuentes solares (amarillas) con los receptores (rojos) para crear energía. ¡Completa todos los niveles!
+            Conecta las fuentes solares (amarillas) con los receptores (rojos) para generar energía. 
+            Cada fuente produce 25 kW. ¡Completa el nivel generando la energía necesaria!
           </p>
         </div>
       )}
