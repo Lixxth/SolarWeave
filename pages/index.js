@@ -4,41 +4,40 @@ import { Inter } from "next/font/google";
 import Button from "@/componentes/login-btn";
 import OfflineButton from "@/componentes/OfflineButton";
 
-
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
-    <main className={`${inter.className} relative min-h-screen bg-gradient-to-b from-white to-blue-100 overflow-hidden`}>
+    <main className={`${inter.className} relative min-h-screen bg-gradient-to-b from-white via-yellow-200 to-red-300 overflow-hidden`}>
       <NextSeo
-        title="Inicio | AquaDetect"
-        description="Plataforma de monitoreo de fugas de agua"
-        canonical="https://www.AquaDetect.com/"
+        title="Inicio | SolarWeave"
+        description="Sistema de calefacción solar mediante mallas inteligentes"
+        canonical="https://www.SolarWeave.com/"
       />
 
       {/* Contenido principal */}
       <div className="flex flex-col items-center justify-center px-4 pt-16 pb-4 text-center relative z-10">
         <Image
-          src="/leakT.png"
-          alt="Logo"
-          width={150}
-          height={150}
+          src="/solarweave-logo.png"
+          alt="SolarWeave Logo"
+          width={250}
+          height={250}
           className="mb-6"
         />
-        <h1 className="text-2xl font-bold text-gray-700 leading-relaxed mb-6">
-          Bienvenido a <span className="text-blue-600">LeakTracking</span>
+        <h1 className="text-2xl font-bold text-gray-800 leading-relaxed mb-6">
+          Bienvenido a <span className="text-red-600">SolarWeave</span>
           <br />
-          Tu ayudante en fugas de agua
+          Calefacción solar inteligente
         </h1>
-        <p className="text-gray-500 mb-10 max-w-md">
-          Únete a la comunidad, monitorea tu consumo y <strong>ahorra agua y dinero</strong>.
+        <p className="text-gray-600 mb-10 max-w-md">
+          Descubre el futuro de la calefacción con nuestras mallas solares. <strong>Ahorra energía y cuida el planeta</strong>.
         </p>
       </div>
 
-      {/* Fondo de olas */}
+      {/* Fondo de patrón solar */}
       <div
           className="w-full h-64 bg-cover bg-bottom pointer-events-none"
-          style={{ backgroundImage: "url('/imagenesbg/Olas.png')" }}
+          style={{ backgroundImage: "url('/imagenesbg/solar-pattern.png')" }}
         >
            <div className="flex justify-center items-center h-full">
            
@@ -49,8 +48,6 @@ export default function Home() {
       <div className="absolute flex-col bottom-24 w-full flex justify-center items-center z-20 px-4 mt-2 ">
         <Button />
         <OfflineButton />
-       
-
       </div>
       
     </main>

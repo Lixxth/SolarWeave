@@ -28,7 +28,7 @@ export default function Button() {
         </span>
         <button
           onClick={() => router.push("/JuegosyConsejos")} 
-          className="w-full px-6 py-3 rounded-full bg-blue-600 text-white font-bold hover:bg-blue-700 transition duration-200 shadow-md"
+          className="w-full px-6 py-3 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition duration-200 shadow-md"
         >
           Ir a Inicio
         </button>
@@ -50,7 +50,7 @@ export default function Button() {
 
       <button
         onClick={() => signIn("google", { callbackUrl: "/inicio" })}
-        className="flex items-center justify-center px-6 py-4 w-full sm:w-64 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold shadow-lg hover:from-blue-600 hover:to-purple-700 transition duration-300 transform hover:scale-105"
+        className="flex items-center justify-center px-6 py-4 w-full sm:w-64 rounded-full bg-gradient-to-r from-red-500 to-orange-600 text-white font-bold shadow-lg hover:from-red-600 hover:to-purple-700 transition duration-300 transform hover:scale-105"
       >
         <FcGoogle className="text-2xl mr-3" />
         Inicia sesión con Google

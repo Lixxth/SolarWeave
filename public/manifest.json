@@ -1,11 +1,11 @@
 {
-    "theme_color": "#0066cc",
-    "background_color": "#0066cc",
+    "theme_color": "#FF6347",
+    "background_color": "#FF6347",
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "Leacktracking",
-    "short_name": "Leacktracking",
+    "name": "SolarWeave",
+    "short_name": "SolarWeave",
     "icons": [
         {
             "src": "/icon-192x192.png",
